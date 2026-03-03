@@ -11,19 +11,24 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddCors();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+
+app.UseCors(x =>
 {
-    app.MapOpenApi();
-}
+    x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:5173", "https://localhost:5173");
+});
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
 app.UseHttpsRedirection();
 
 app.MapControllers();
 
-using var  scope = app.Services.CreateScope();
+using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
 
 try
@@ -39,5 +44,3 @@ catch (Exception ex)
 }
 
 app.Run();
-
- 
